@@ -5,6 +5,7 @@ import com.alexsobiek.nexus.Nexus;
 import com.alexsobiek.nexus.inject.NexusInject;
 import com.alexsobiek.nexus.lazy.Lazy;
 import com.alexsobiek.pluginlib.adapter.Adapter;
+import com.alexsobiek.pluginlib.adapter.EventAdapter;
 import com.alexsobiek.pluginlib.concurrent.CompletableBukkitFuture;
 import com.alexsobiek.pluginlib.concurrent.LifetimeTickScheduler;
 import com.alexsobiek.pluginlib.util.PlayerCacheManager;
@@ -29,6 +30,7 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
     private final Lazy<LifetimeTickScheduler> lifetimeTickScheduler = new Lazy<>(() -> new LifetimeTickScheduler(this));
     private final Lazy<ViolationManager> violationManager = new Lazy<>(() -> new ViolationManager(this, 5));
     private BukkitCommandManager commandManager;
+    private TeleportManager teleportManager;
 
 
     public PlayerCacheManager getPlayerCache() {
@@ -59,6 +61,10 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
         return commandManager;
     }
 
+    public TeleportManager getTeleportManager() {
+        return teleportManager;
+    }
+
     public <T> Optional<T> getService(Class<T> serviceClass) {
         RegisteredServiceProvider<T> rsp = getServer().getServicesManager().getRegistration(serviceClass);
         if (rsp == null) return Optional.empty();
@@ -77,6 +83,7 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         commandManager = new BukkitCommandManager(this);
+        teleportManager = EventAdapter.register(TeleportManager.class, this);
         getAdapters().forEach(Adapter::enable);
         getServer().getPluginManager().registerEvents(this, this);
         enable();
