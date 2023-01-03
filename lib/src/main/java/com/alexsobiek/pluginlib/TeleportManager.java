@@ -15,7 +15,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import java.lang.module.Configuration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

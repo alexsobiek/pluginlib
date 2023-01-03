@@ -17,7 +17,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
 
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -28,7 +27,7 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
     private final Lazy<Nexus> nexus = new Lazy<>(() -> Nexus.builder().build());
     private final Lazy<NexusInject> nexusInject = new Lazy<>(() -> getNexus().library(NexusInject.buildable()));
     private final Lazy<LifetimeTickScheduler> lifetimeTickScheduler = new Lazy<>(() -> new LifetimeTickScheduler(this));
-    private Lazy<ViolationManager> violationManager = new Lazy<>(() -> new ViolationManager(this, 5));
+    private final Lazy<ViolationManager> violationManager = new Lazy<>(() -> new ViolationManager(this, 5));
     private BukkitCommandManager commandManager;
 
 
@@ -122,7 +121,6 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
     }
 
     public abstract void enable();
-
 
 
     public abstract void disable();

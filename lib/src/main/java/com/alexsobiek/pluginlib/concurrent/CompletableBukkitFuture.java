@@ -3,7 +3,6 @@ package com.alexsobiek.pluginlib.concurrent;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.plugin.Plugin;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
