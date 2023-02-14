@@ -5,6 +5,7 @@ import net.luckperms.api.model.group.Group;
 import net.luckperms.api.query.QueryOptions;
 import org.bukkit.entity.Player;
 
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -15,7 +16,7 @@ public class PermUtil {
                     if (filter.test(primary)) return primary;
                     else return user.getInheritedGroups(QueryOptions.nonContextual()).stream()
                             .filter(filter)
-                            .max((o1, o2) -> Integer.compare(o2.getWeight().orElse(0), o1.getWeight().orElse(0))).orElse(null);
+                            .max(Comparator.comparingInt(o -> o.getWeight().orElse(0))).orElse(null);
                 }));
     }
 }
