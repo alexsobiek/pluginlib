@@ -19,7 +19,8 @@ dependencies {
     annotationProcessor("org.projectlombok", "lombok", "1.18.22")
     compileOnly("org.purpurmc.purpur", "purpur-api", "1.19.2-R0.1-SNAPSHOT")
     implementation("com.alexsobiek", "nexus", "main-SNAPSHOT")
-    implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
+    implementation("co.aikar", "acf-paper", "0.5.1-SNAPSHOT")
+    compileOnly("net.luckperms", "api", "5.4")
 }
 
 tasks {
