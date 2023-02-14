@@ -87,6 +87,7 @@ public class TeleportManager extends EventAdapter<AbstractPlugin> {
     }
 
     private boolean shouldInstantTP(Player player) {
+        if (player.isOp()) return true;
         if (instantTeleportConditions.isEmpty()) return false;
         for (Predicate<Player> condition : instantTeleportConditions)
             if (!condition.test(player)) return false;
