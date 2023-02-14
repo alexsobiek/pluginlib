@@ -87,6 +87,7 @@ public class TeleportManager extends EventAdapter<AbstractPlugin> {
     }
 
     private boolean shouldInstantTP(Player player) {
+        if (instantTeleportConditions.isEmpty()) return false;
         for (Predicate<Player> condition : instantTeleportConditions)
             if (!condition.test(player)) return false;
         return true;
@@ -147,7 +148,7 @@ public class TeleportManager extends EventAdapter<AbstractPlugin> {
 
     public void teleport(Player player, Location location, int seconds) {
         if (location != null)
-            if (seconds < 0 || shouldInstantTP(player)) instantTeleport(player, location);
+            if (seconds < 1 || shouldInstantTP(player)) instantTeleport(player, location);
             else queueTeleport(player, seconds, location);
         else player.sendMessage(teleportFail);
     }
@@ -160,7 +161,7 @@ public class TeleportManager extends EventAdapter<AbstractPlugin> {
 
 
     public void teleport(Player p1, Player p2, int seconds) {
-        if (seconds < 0 || shouldInstantTP(p1)) instantTeleport(p1, p2.getLocation());
+        if (seconds < 1 || shouldInstantTP(p1)) instantTeleport(p1, p2.getLocation());
         else queueTeleportAction(p1, seconds, p -> {
             if (p2.isOnline()) instantTeleport(p1, p2.getLocation());
             else p1.sendMessage(teleportFail);
