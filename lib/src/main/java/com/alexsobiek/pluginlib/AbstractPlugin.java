@@ -6,17 +6,27 @@ import com.alexsobiek.nexus.inject.NexusInject;
 import com.alexsobiek.nexus.lazy.Lazy;
 import com.alexsobiek.pluginlib.adapter.Adapter;
 import com.alexsobiek.pluginlib.adapter.EventAdapter;
+import com.alexsobiek.pluginlib.component.Color;
 import com.alexsobiek.pluginlib.concurrent.CompletableBukkitFuture;
 import com.alexsobiek.pluginlib.concurrent.LifetimeTickScheduler;
 import com.alexsobiek.pluginlib.util.PlayerCacheManager;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -69,6 +79,34 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
         RegisteredServiceProvider<T> rsp = getServer().getServicesManager().getRegistration(serviceClass);
         if (rsp == null) return Optional.empty();
         else return Optional.of(rsp.getProvider());
+    }
+
+    /**
+     * Registers a command to the server
+     * @Author 254n_m
+     * @param name Name of the command
+     * @param command CommandExecutor
+     */
+    public void registerCommand(String name, CommandExecutor command) {
+        try {
+            Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
+            constructor.setAccessible(true);
+            PluginCommand pluginCommand = constructor.newInstance(name, this);
+            pluginCommand.setExecutor(command);
+
+
+            Server server = Bukkit.getServer();
+
+            Method commandMapMethod = server.getClass().getDeclaredMethod("getCommandMap");
+            commandMapMethod.setAccessible(true);
+
+            Method registerMethod = commandMapMethod.getReturnType().getDeclaredMethod("register", String.class, Command.class);
+            registerMethod.setAccessible(true);
+
+            registerMethod.invoke(commandMapMethod.invoke(server), name, pluginCommand);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 
     public Logger logger() {
