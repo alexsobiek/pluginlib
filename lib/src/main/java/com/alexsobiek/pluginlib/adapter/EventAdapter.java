@@ -37,12 +37,12 @@ public abstract class EventAdapter<P extends AbstractPlugin> implements Adapter<
         }
     }
 
-    public <T extends Closeable> T register(T closeable) {
+    protected <T extends Closeable> T register(T closeable) {
         closeables.add(closeable);
         return closeable;
     }
 
-    public void unregisterListeners() {
+    private void unregisterListeners() {
         for (Method method : this.getClass().getDeclaredMethods()) {
             method.setAccessible(true);
             if (method.isAnnotationPresent(EventHandler.class)) {
