@@ -124,6 +124,22 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
         teleportManager = EventAdapter.register(TeleportManager.class, this);
         getAdapters().forEach(Adapter::enable);
         getServer().getPluginManager().registerEvents(this, this);
+
+        registerCommand(String.format("%sreload", getName()), (sender, command, label, args) -> {
+            if (sender.hasPermission(String.format("%s.reload", getName()))) {
+                try {
+                    reload();
+                    sender.sendMessage(Component.text(String.format("%s reloaded.", getName()), Color.GREEN));
+                } catch (Throwable t) {
+                    sender.sendMessage(Component.text(String.format("Error reloading %s. Check console for more details.", getName()), Color.RED));
+                    t.printStackTrace();
+                }
+            } else {
+                sender.sendMessage(Component.text("You do not have permission to do that.", Color.RED));
+            }
+            return true;
+        });
+
         enable();
     }
 
