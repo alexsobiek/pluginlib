@@ -31,6 +31,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public abstract class AbstractPlugin extends JavaPlugin implements Listener {
     private final List<Adapter<? extends AbstractPlugin>> adapters = new ArrayList<>();
@@ -46,6 +47,11 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
 
     public boolean isReloading() {
         return reloadLock;
+    }
+
+
+    public Logger logger() {
+        return this.getSLF4JLogger();
     }
 
     public PlayerCacheManager getPlayerCache() {
@@ -114,8 +120,8 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
         }
     }
 
-    public Logger logger() {
-        return this.getSLF4JLogger();
+    protected Stream<Adapter<? extends AbstractPlugin>> enabledAdapters() {
+        return getAdapters().stream().filter(Adapter::isEnabled);
     }
 
     @EventHandler
@@ -150,7 +156,7 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        getAdapters().forEach(Adapter::disable);
+        enabledAdapters().forEach(Adapter::disable);
         getPlayerCache().clear();
         disable();
     }
@@ -183,10 +189,9 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
 
     public void reload() {
         reloadLock = true;
-
         try {
             reloadConfig();
-            getAdapters().forEach(Adapter::reload);
+            enabledAdapters().forEach(Adapter::reload);
         } catch (Throwable t) {
             reloadLock = false; // unlock reload in case there is an exception
             throw t;
@@ -194,8 +199,7 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
         reloadLock = false;
     }
 
-    public abstract void enable();
-
-
     public abstract void disable();
+
+    public abstract void enable();
 }

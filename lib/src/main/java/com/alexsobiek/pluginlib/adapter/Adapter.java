@@ -40,6 +40,8 @@ public interface Adapter<P extends AbstractPlugin> {
 
     P getPlugin();
 
+    boolean isEnabled();
+
     void enable();
 
     void reload();
