@@ -183,8 +183,14 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
 
     public void reload() {
         reloadLock = true;
-        reloadConfig();
-        getAdapters().forEach(Adapter::reload);
+
+        try {
+            reloadConfig();
+            getAdapters().forEach(Adapter::reload);
+        } catch (Throwable t) {
+            reloadLock = false; // unlock reload in case there is an exception
+            throw t;
+        }
         reloadLock = false;
     }
 
