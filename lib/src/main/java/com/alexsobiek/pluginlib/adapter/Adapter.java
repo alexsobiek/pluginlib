@@ -4,6 +4,7 @@ import com.alexsobiek.nexus.inject.dependency.DependencyProvider;
 import com.alexsobiek.pluginlib.AbstractPlugin;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public interface Adapter<P extends AbstractPlugin> {
@@ -13,7 +14,20 @@ public interface Adapter<P extends AbstractPlugin> {
             Optional<T> opt = plugin.getNexusInject().construct(adapter, dependencyProvider).get();
             if (opt.isPresent()) {
                 T instance = opt.get();
-                plugin.getAdapters().add(instance);
+
+                if (!plugin.isReloading()) plugin.getAdapters().add(instance);
+                else CompletableFuture.runAsync(() -> {
+                    while (plugin.isReloading()) {
+                        try {
+                            Thread.sleep(1);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    plugin.getAdapters().add(instance);
+                    plugin.logger().warn("Attempted to register adapter {} while a reload was in progress.", adapter.getSimpleName());
+                });
+
                 afterConstruct.accept(instance);
                 return instance;
             }

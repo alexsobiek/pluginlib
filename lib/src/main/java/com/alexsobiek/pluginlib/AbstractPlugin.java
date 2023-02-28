@@ -39,9 +39,14 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
     private final Lazy<NexusInject> nexusInject = new Lazy<>(() -> getNexus().library(NexusInject.buildable()));
     private final Lazy<LifetimeTickScheduler> lifetimeTickScheduler = new Lazy<>(() -> new LifetimeTickScheduler(this));
     private final Lazy<ViolationManager> violationManager = new Lazy<>(() -> new ViolationManager(this, 5));
+    private boolean reloadLock;
     private BukkitCommandManager commandManager;
     private TeleportManager teleportManager;
 
+
+    public boolean isReloading() {
+        return reloadLock;
+    }
 
     public PlayerCacheManager getPlayerCache() {
         return playerCacheManager.get();
@@ -177,8 +182,10 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
     }
 
     public void reload() {
+        reloadLock = true;
         reloadConfig();
         getAdapters().forEach(Adapter::reload);
+        reloadLock = false;
     }
 
     public abstract void enable();
