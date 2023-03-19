@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -31,6 +32,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class AbstractPlugin extends JavaPlugin implements Listener {
@@ -133,7 +135,6 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
     public void onEnable() {
         commandManager = new BukkitCommandManager(this);
         teleportManager = EventAdapter.register(TeleportManager.class, this);
-        getAdapters().forEach(Adapter::enable);
         getServer().getPluginManager().registerEvents(this, this);
 
         registerCommand(String.format("%sreload", getName()), (sender, command, label, args) -> {
@@ -185,6 +186,29 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
 
     public Optional<Player> getPlayer(String name) {
         return Optional.ofNullable(getServer().getPlayer(name));
+    }
+
+    public Optional<Integer> getMaxPerm(Set<PermissionAttachmentInfo> perms, String perm) {
+        return perms.stream()
+                .map(PermissionAttachmentInfo::getPermission)
+                .map(s -> Integer.parseInt(s.substring(s.lastIndexOf('.') + 1)))
+                .max(Integer::compareTo);
+    }
+
+    public Optional<Integer> getMaxPerm(Player player, String perm) {
+        return getMaxPerm(player.getEffectivePermissions(), perm);
+    }
+
+    public Collection<String> getPermissions(Set<PermissionAttachmentInfo> perms, String prefix) {
+        final String p = prefix.endsWith(".") ? prefix : prefix + ".";
+        return perms.stream()
+                .map(PermissionAttachmentInfo::getPermission)
+                .filter(s -> s.startsWith(p))
+                .collect(Collectors.toList());
+    }
+
+    public Collection<String> getPermissions(Player player, String prefix) {
+        return getPermissions(player.getEffectivePermissions(), prefix);
     }
 
     public void reload() {
