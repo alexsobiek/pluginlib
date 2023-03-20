@@ -191,7 +191,13 @@ public abstract class AbstractPlugin extends JavaPlugin implements Listener {
     public Optional<Integer> getMaxPerm(Set<PermissionAttachmentInfo> perms, String perm) {
         return perms.stream()
                 .map(PermissionAttachmentInfo::getPermission)
-                .map(s -> Integer.parseInt(s.substring(s.lastIndexOf('.') + 1)))
+                .map(s -> {
+                    try {
+                        return Integer.parseInt(s.substring(s.lastIndexOf('.') + 1));
+                    } catch (NumberFormatException e) {
+                        return -1;
+                    }
+                })
                 .max(Integer::compareTo);
     }
 
