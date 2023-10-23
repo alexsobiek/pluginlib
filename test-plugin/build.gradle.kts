@@ -18,6 +18,7 @@ dependencies {
     compileOnly("org.projectlombok", "lombok", "1.18.22")
     annotationProcessor("org.projectlombok", "lombok", "1.18.22")
     paperweightDevelopmentBundle("org.purpurmc.purpur:dev-bundle:${project.property("api_version")}")
+    compileOnly("co.aikar", "acf-paper", "0.5.1-SNAPSHOT")
     implementation(project(":lib"))
 }
 

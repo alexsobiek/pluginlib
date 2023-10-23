@@ -1,6 +1,7 @@
 package com.alexsobiek.pluginlib.test;
 
 import com.alexsobiek.pluginlib.AbstractPlugin;
+import com.alexsobiek.pluginlib.adapter.CommandAdapter;
 import com.alexsobiek.pluginlib.adapter.EventAdapter;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -10,18 +11,11 @@ public class TestPlugin extends AbstractPlugin {
         TestEventAdapter adapter = EventAdapter.register(TestEventAdapter.class, this);
         logger().info("Registered adapter: {}", adapter);
 
-        AutoCloseable listener = EventAdapter.listen(this, PlayerJoinEvent.class, event -> {
-            event.getPlayer().sendMessage("Hello from the test plugin!");
-        });
+        CommandAdapter.register(TestCommand.class, this);
 
-        getServer().getScheduler().runTaskLater(this, () -> {
-            try {
-                listener.close();
-                System.out.println("Closed listener");
-            } catch (Throwable t) {
-                logger().error("Failed to close listener", t);
-            }
-        }, 400L);
+        EventAdapter.listen(this, PlayerJoinEvent.class, event -> {
+            System.out.println(this.getMaxPerm(event.getPlayer(), "test").orElse(0));
+        });
     }
 
     @Override

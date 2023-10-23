@@ -5,11 +5,10 @@ import com.alexsobiek.nexus.inject.annotation.Inject;
 import com.alexsobiek.pluginlib.AbstractPlugin;
 import lombok.Getter;
 
+@Getter
 public abstract class CommandAdapter<P extends AbstractPlugin> extends BaseCommand implements Adapter<P> {
-    @Getter
     private boolean enabled = false;
     @Inject
-    @Getter
     private P plugin;
 
     public static <P extends AbstractPlugin, T extends CommandAdapter<P>> T register(Class<T> adapter, P plugin) {
